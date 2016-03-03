@@ -9,9 +9,13 @@ public class Krankheit {
 
     private int nummer;
     private String beschreibung;
-    private ArrayList<Symptom> symptome;
 
     public Krankheit() {
+    }
+
+    public Krankheit(int nummer, String beschreibung) {
+        this.nummer = nummer;
+        this.beschreibung = beschreibung;
     }
 
     public int getNummer() {
@@ -30,20 +34,11 @@ public class Krankheit {
         this.beschreibung = beschreibung;
     }
 
-    public ArrayList<Symptom> getSymptome() {
-        return symptome;
-    }
-
-    public void setSymptome(ArrayList<Symptom> symptome) {
-        this.symptome = symptome;
-    }
-
     @Override
     public String toString() {
         return "Krankheit{" +
                 "nummer=" + nummer +
                 ", beschreibung='" + beschreibung + '\'' +
-                ", symptome=" + symptome +
                 '}';
     }
 }

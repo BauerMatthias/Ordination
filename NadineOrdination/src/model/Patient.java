@@ -1,36 +1,42 @@
 package model;
 
 import java.util.ArrayList;
+import java.time.LocalDate;
 
 /**
  * Created by Matthias on 04.02.2016.
  */
 public class Patient {
 
-    private int nummer;
+    private int id;
     private String vorname;
     private String nachname;
     private String adresse;
+    private LocalDate gebDatum;
     private String telNummer;
     private ArrayList<Krankheit> krankheiten;
-
-    public Patient(int nummer, String vorname, String nachname, String adresse, String telNummer) {
-        this.nummer = nummer;
-        this.vorname = vorname;
-        this.nachname = nachname;
-        this.adresse = adresse;
-        this.telNummer = telNummer;
-    }
+    private double tarif;
 
     public Patient() {
     }
 
-    public int getNummer() {
-        return nummer;
+    public Patient(int id, String vorname, String nachname, String adresse, LocalDate gebDatum, String telNummer, ArrayList<Krankheit> krankheiten, double tarif) {
+        this.id = id;
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.adresse = adresse;
+        this.gebDatum = gebDatum;
+        this.telNummer = telNummer;
+        this.krankheiten = krankheiten;
+        this.tarif = tarif;
     }
 
-    public void setNummer(int nummer) {
-        this.nummer = nummer;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getVorname() {
@@ -57,6 +63,14 @@ public class Patient {
         this.adresse = adresse;
     }
 
+    public LocalDate getGebDatum() {
+        return gebDatum;
+    }
+
+    public void setGebDatum(LocalDate gebDatum) {
+        this.gebDatum = gebDatum;
+    }
+
     public String getTelNummer() {
         return telNummer;
     }
@@ -65,15 +79,33 @@ public class Patient {
         this.telNummer = telNummer;
     }
 
+    public ArrayList<Krankheit> getKrankheiten() {
+        return krankheiten;
+    }
+
+    public void setKrankheiten(ArrayList<Krankheit> krankheiten) {
+        this.krankheiten = krankheiten;
+    }
+
+    public double getTarif() {
+        return tarif;
+    }
+
+    public void setTarif(double tarif) {
+        this.tarif = tarif;
+    }
+
     @Override
     public String toString() {
         return "Patient{" +
-                "nummer=" + nummer +
+                "id=" + id +
                 ", vorname='" + vorname + '\'' +
                 ", nachname='" + nachname + '\'' +
                 ", adresse='" + adresse + '\'' +
+                ", gebDatum=" + gebDatum +
                 ", telNummer='" + telNummer + '\'' +
                 ", krankheiten=" + krankheiten +
+                ", tarif=" + tarif +
                 '}';
     }
 }

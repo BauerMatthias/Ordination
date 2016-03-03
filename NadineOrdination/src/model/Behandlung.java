@@ -8,20 +8,35 @@ import java.util.ArrayList;
  */
 public class Behandlung {
 
-    private int nummer;
+    private int id;
     private Patient patient;
     private LocalDate datum;
     private ArrayList<Krankheit> krankheiten;
+    private Behandlung_Beschreibung beschreibung;
+    private int dauer;
+    private double einnahme;
+    private String bemerkung;
 
     public Behandlung() {
     }
 
-    public int getNummer() {
-        return nummer;
+    public Behandlung(int id, Patient patient, LocalDate datum, ArrayList<Krankheit> krankheiten, Behandlung_Beschreibung beschreibung, int dauer, double einnahme, String bemerkung) {
+        this.id = id;
+        this.patient = patient;
+        this.datum = datum;
+        this.krankheiten = krankheiten;
+        this.beschreibung = beschreibung;
+        this.dauer = dauer;
+        this.einnahme = einnahme;
+        this.bemerkung = bemerkung;
     }
 
-    public void setNummer(int nummer) {
-        this.nummer = nummer;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Patient getPatient() {
@@ -48,13 +63,49 @@ public class Behandlung {
         this.krankheiten = krankheiten;
     }
 
+    public Behandlung_Beschreibung getBeschreibung() {
+        return beschreibung;
+    }
+
+    public void setBeschreibung(Behandlung_Beschreibung beschreibung) {
+        this.beschreibung = beschreibung;
+    }
+
+    public int getDauer() {
+        return dauer;
+    }
+
+    public void setDauer(int dauer) {
+        this.dauer = dauer;
+    }
+
+    public double getEinnahme() {
+        return einnahme;
+    }
+
+    public void setEinnahme(double einnahme) {
+        this.einnahme = einnahme;
+    }
+
+    public String getBemerkung() {
+        return bemerkung;
+    }
+
+    public void setBemerkung(String bemerkung) {
+        this.bemerkung = bemerkung;
+    }
+
     @Override
     public String toString() {
         return "Behandlung{" +
-                "nummer=" + nummer +
+                "id=" + id +
                 ", patient=" + patient +
                 ", datum=" + datum +
                 ", krankheiten=" + krankheiten +
+                ", beschreibung=" + beschreibung +
+                ", dauer=" + dauer +
+                ", einnahme=" + einnahme +
+                ", bemerkung='" + bemerkung + '\'' +
                 '}';
     }
 }
