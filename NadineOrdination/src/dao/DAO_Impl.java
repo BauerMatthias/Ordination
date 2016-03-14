@@ -171,6 +171,36 @@ public class DAO_Impl implements DAO {
     }
 
     @Override
+    public double getTarifByPatient(Patient p) {
+        if(p == null){
+            throw new IllegalArgumentException("Kein Patient übergeben");
+        }
+
+        Double ret = -1.0;
+        try {
+            Connection c = DBConnector.getConnection();
+            String sql = "SELECT TARIF FROM PATIENT WHERE P_ID = ?";
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+            System.out.println("Übergebener patient: " + p.getId());
+            pstm.setInt(1, p.getId());
+            ResultSet rs = pstm.executeQuery();
+
+            while(rs.next()){
+                ret = rs.getDouble("Tarif");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        System.out.println("Tarif lautet: " + ret);
+
+        return ret;
+
+    }
+
+    @Override
     public ArrayList<Krankheit> getAllKrankheiten() {
         ArrayList<Krankheit> ret = new ArrayList<Krankheit>();
         try {

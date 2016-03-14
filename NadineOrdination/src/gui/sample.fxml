@@ -33,14 +33,13 @@
                               <DatePicker fx:id="dc_datum" layoutX="199.0" layoutY="70.0" />
                               <Label layoutX="57.0" layoutY="120.0" text="Beschreibung" />
                               <ChoiceBox fx:id="cb_beschreibung" layoutX="198.0" layoutY="116.0" prefHeight="25.0" prefWidth="176.0" />
-                              <Label layoutX="56.0" layoutY="164.0" text="Dauer" />
-                              <Label layoutX="56.0" layoutY="203.0" text="Einnahme" />
-                              <Label layoutX="56.0" layoutY="250.0" text="Bemerkung" />
-                              <TextField fx:id="tf_dauer" layoutX="198.0" layoutY="160.0" prefHeight="25.0" prefWidth="176.0" />
-                              <TextField fx:id="tf_einnahme" layoutX="198.0" layoutY="199.0" prefHeight="25.0" prefWidth="177.0" />
-                              <TextArea fx:id="ta_bemerkung" layoutX="198.0" layoutY="250.0" prefHeight="200.0" prefWidth="406.0" />
-                              <Button fx:id="btn_beh_speichern" layoutX="535.0" layoutY="513.0" mnemonicParsing="false" text="Speichern" />
+                              <Label layoutX="54.0" layoutY="164.0" text="Einnahme" />
+                              <Label layoutX="56.0" layoutY="204.0" text="Bemerkung" />
+                              <TextField fx:id="tf_einnahme" layoutX="198.0" layoutY="160.0" prefHeight="25.0" prefWidth="177.0" />
+                              <TextArea fx:id="ta_bemerkung" layoutX="191.0" layoutY="204.0" prefHeight="200.0" prefWidth="406.0" />
+                              <Button fx:id="btn_beh_speichern" layoutX="528.0" layoutY="441.0" mnemonicParsing="false" text="Speichern" />
                               <TextField fx:id="tf_beschreibung_sonstiges" layoutX="401.0" layoutY="116.0" prefHeight="25.0" prefWidth="208.0" visible="false" />
+                              <Label layoutX="380.0" layoutY="164.0" text="€" />
                            </children>
                         </AnchorPane>
                   </content>

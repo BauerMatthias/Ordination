@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import model.Behandlung_Beschreibung;
+import model.Patient;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -87,9 +88,38 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Changelistener für sonstiges bei Beschreibung der Behandlungsart
+
+        cb_beschreibung.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if(cb_beschreibung.getSelectionModel().getSelectedIndex() == 9){
+                    tf_beschreibung_sonstiges.setVisible(true);
+                } else {
+                    tf_beschreibung_sonstiges.setVisible(false);
+                }
+            }
+        });
+
+        cb_patient.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                Patient currentPatient = null;
+                int i = cb_patient.getSelectionModel().getSelectedIndex();
+                currentPatient = (Patient) cb_patient.getItems().get(i);
+                if(currentPatient != null){
+                    tf_einnahme.setTooltip(new Tooltip("Der Tarif für diesen Patient ist: " + dao.getTarifByPatient(currentPatient)));
+                } else {
+                    System.out.println("kein Patient gewählt.");
+                }
+            }
+        });
+
+
         // Initialize choicebox to show all patients for the current behandlung
         initializePatientenChoicebox();
         initializeBeschreibungChoicebox();
+
     }
 
     private void initializeBeschreibungChoicebox() {
@@ -97,21 +127,6 @@ public class Controller implements Initializable{
             this.cb_beschreibung.getItems().remove(0, cb_beschreibung.getItems().size());
         }
         this.cb_beschreibung.setItems(FXCollections.observableArrayList(Behandlung_Beschreibung.values()));
-
-        ChangeListener beschreibung_listener = new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                System.out.println("im change listener");
-                if (cb_beschreibung.getSelectionModel().getSelectedItem().equals("sonstiges")) {
-                    tf_beschreibung_sonstiges.setVisible(true);
-                } else {
-                    tf_beschreibung_sonstiges.setVisible(false);
-                }
-            }
-        };
-
-        // TODO change listener
-        this.cb_beschreibung.selectionModelProperty().addListener(beschreibung_listener);
     }
 
     private void initializePatientenChoicebox() {

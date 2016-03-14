@@ -26,6 +26,9 @@ public interface DAO {
     // Löscht einen Patienten aus der DB
     public boolean deletePatient(Patient p);
 
+    // Gibt den Tarif für diese Person aus
+    public double getTarifByPatient(Patient p);
+
     // Gibt alle Krankheiten aus der Datenbank zurück
     public ArrayList<Krankheit> getAllKrankheiten();
 
