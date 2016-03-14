@@ -13,20 +13,27 @@ public class Behandlung {
     private LocalDate datum;
     private ArrayList<Krankheit> krankheiten;
     private Behandlung_Beschreibung beschreibung;
-    private int dauer;
     private double einnahme;
     private String bemerkung;
 
     public Behandlung() {
     }
 
-    public Behandlung(int id, Patient patient, LocalDate datum, ArrayList<Krankheit> krankheiten, Behandlung_Beschreibung beschreibung, int dauer, double einnahme, String bemerkung) {
+    public Behandlung(int id, Patient patient, LocalDate datum, Behandlung_Beschreibung beschreibung, double einnahme, String bemerkung) {
+        this.id = id;
+        this.patient = patient;
+        this.datum = datum;
+        this.beschreibung = beschreibung;
+        this.einnahme = einnahme;
+        this.bemerkung = bemerkung;
+    }
+
+    public Behandlung(int id, Patient patient, LocalDate datum, ArrayList<Krankheit> krankheiten, Behandlung_Beschreibung beschreibung, double einnahme, String bemerkung) {
         this.id = id;
         this.patient = patient;
         this.datum = datum;
         this.krankheiten = krankheiten;
         this.beschreibung = beschreibung;
-        this.dauer = dauer;
         this.einnahme = einnahme;
         this.bemerkung = bemerkung;
     }
@@ -71,14 +78,6 @@ public class Behandlung {
         this.beschreibung = beschreibung;
     }
 
-    public int getDauer() {
-        return dauer;
-    }
-
-    public void setDauer(int dauer) {
-        this.dauer = dauer;
-    }
-
     public double getEinnahme() {
         return einnahme;
     }
@@ -103,7 +102,6 @@ public class Behandlung {
                 ", datum=" + datum +
                 ", krankheiten=" + krankheiten +
                 ", beschreibung=" + beschreibung +
-                ", dauer=" + dauer +
                 ", einnahme=" + einnahme +
                 ", bemerkung='" + bemerkung + '\'' +
                 '}';

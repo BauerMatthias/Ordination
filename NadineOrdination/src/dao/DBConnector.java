@@ -3,11 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.LogManager;
 
-/**
- * Created by Matthias on 04.02.2016.
- */
 public class DBConnector {
 
     private static Connection con = null;
@@ -15,9 +11,11 @@ public class DBConnector {
     private static Connection openConnection() throws SQLException{
         try {
             Class.forName("org.h2.Driver");
-            con = DriverManager.getConnection();        // TODO: link to database
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            con = DriverManager.getConnection("jdbc:h2:C:\\Users\\Matthias\\Desktop\\Ordination\\Ordination\\NadineOrdination", "admin", "admin");
+        } catch (ClassNotFoundException ex) {
+            System.err.println("Datenbanktreiber nicht verfuegbar - Fehler: " + ex);
+        } catch (SQLException e){
+            System.err.println("Datenbankverbindung fehlgeschlagen - Fehler: " + e);
         }
 
         return con;

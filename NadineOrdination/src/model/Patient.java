@@ -20,6 +20,16 @@ public class Patient {
     public Patient() {
     }
 
+    public Patient(int id, String vorname, String nachname, String adresse, LocalDate gebDatum, String telNummer, double tarif) {
+        this.id = id;
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.adresse = adresse;
+        this.gebDatum = gebDatum;
+        this.telNummer = telNummer;
+        this.tarif = tarif;
+    }
+
     public Patient(int id, String vorname, String nachname, String adresse, LocalDate gebDatum, String telNummer, ArrayList<Krankheit> krankheiten, double tarif) {
         this.id = id;
         this.vorname = vorname;
@@ -97,15 +107,6 @@ public class Patient {
 
     @Override
     public String toString() {
-        return "Patient{" +
-                "id=" + id +
-                ", vorname='" + vorname + '\'' +
-                ", nachname='" + nachname + '\'' +
-                ", adresse='" + adresse + '\'' +
-                ", gebDatum=" + gebDatum +
-                ", telNummer='" + telNummer + '\'' +
-                ", krankheiten=" + krankheiten +
-                ", tarif=" + tarif +
-                '}';
+        return vorname + " " + nachname;
     }
 }

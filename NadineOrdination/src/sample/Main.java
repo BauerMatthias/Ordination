@@ -1,10 +1,16 @@
 package sample;
 
+import dao.DAO;
+import dao.DAO_Impl;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Behandlung_Beschreibung;
+import model.Patient;
+
+import java.util.ArrayList;
 
 public class Main extends Application {
 
