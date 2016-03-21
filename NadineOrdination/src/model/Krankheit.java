@@ -36,9 +36,6 @@ public class Krankheit {
 
     @Override
     public String toString() {
-        return "Krankheit{" +
-                "nummer=" + nummer +
-                ", beschreibung='" + beschreibung + '\'' +
-                '}';
+        return beschreibung;
     }
 }

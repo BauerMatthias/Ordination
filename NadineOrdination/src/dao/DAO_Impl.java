@@ -54,16 +54,15 @@ public class DAO_Impl implements DAO {
         int i = 0;
         try {
             Connection c = DBConnector.getConnection();
-            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("INSERT INTO PATIENT (P_ID, VNAME, NNAME, ADRESSE, GEBDATUM, TELNR, TARIF) VALUES(?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("INSERT INTO PATIENT (VNAME, NNAME, ADRESSE, GEBDATUM, TELNR, TARIF) VALUES(?, ?, ?, ?, ?, ?)");
 
-            pstm.setInt(1, p.getId());
-            pstm.setString(2, p.getVorname());
-            pstm.setString(3, p.getNachname());
-            pstm.setString(4, p.getAdresse());
+            pstm.setString(1, p.getVorname());
+            pstm.setString(2, p.getNachname());
+            pstm.setString(3, p.getAdresse());
             Date convertedDate = Date.valueOf(p.getGebDatum());
-            pstm.setDate(5, convertedDate);
-            pstm.setString(6, p.getTelNummer());
-            pstm.setDouble(7, p.getTarif());
+            pstm.setDate(4, convertedDate);
+            pstm.setString(5, p.getTelNummer());
+            pstm.setDouble(6, p.getTarif());
 
             i = pstm.executeUpdate();
         } catch (SQLException e) {

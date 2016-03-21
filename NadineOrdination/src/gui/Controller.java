@@ -5,17 +5,20 @@ import dao.DAO_Impl;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import model.Behandlung;
 import model.Behandlung_Beschreibung;
+import model.Krankheit;
 import model.Patient;
 
 import javax.security.auth.callback.ConfirmationCallback;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -120,11 +123,76 @@ public class Controller implements Initializable{
             }
         });
 
+        cb_patient_bearb_loesch.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                Patient chosen = (Patient) cb_patient_bearb_loesch.getItems().get(newValue.intValue());
 
-        // Initialize choicebox to show all patients for the current behandlung
+                if(chosen != null) {
+                    fillBearbeitenPatient(chosen);
+
+                }
+            }
+        });
+
+        // Initialize choicebox/listviews
         initializePatientenChoicebox();
         initializeBeschreibungChoicebox();
+        initializeKrankheitenListView();
+        initializePatientBearbeitenChoicebox();
+    }
 
+    private void fillBearbeitenPatient(Patient p){
+        tf_vname_bearb.setText(p.getVorname());
+        tf_nname_bearb.setText(p.getNachname());
+        tf_adresse_bearb.setText(p.getAdresse());
+        dc_gebdatum_bearb.setValue(p.getGebDatum());
+        tf_telnr_bearb.setText(p.getTelNummer());
+        tf_tarif_bearb.setText(Double.toString(p.getTarif()));
+        selectKrankheitenbyPatient(p);
+    }
+
+    private void selectKrankheitenbyPatient(Patient p) {
+        System.out.println("p: " + p);
+        for(Krankheit k : p.getKrankheiten()){
+            System.out.println(k);
+        }
+
+        for(Krankheit k : p.getKrankheiten()) {
+            System.out.println("index: " + lv_krankheiten_bearb.getItems().indexOf(k));
+        }
+//        for(Krankheit k : p.getKrankheiten()){
+//            lv_krankheiten_bearb.getSelectionModel().select(lv_krankheiten_bearb.getItems().indexOf(k));
+//        }
+    }
+
+    private void initializePatientBearbeitenChoicebox() {
+        if(cb_patient_bearb_loesch.getItems().size() > 0){
+            this.cb_patient_bearb_loesch.getItems().remove(0, cb_patient_bearb_loesch.getItems().size());
+        }
+        this.cb_patient_bearb_loesch.setItems(FXCollections.observableArrayList(dao.getAllPatienten()));
+
+        ArrayList<Patient> pList = dao.getAllPatienten();
+
+        this.cb_patient_bearb_loesch.setItems(FXCollections.observableArrayList(pList));
+
+        fillBearbeitenPatient(pList.get(0));
+    }
+
+    private void initializeKrankheitenListView() {
+        if(this.lv_krankheiten_anlegen.getItems().size() > 0){
+            this.lv_krankheiten_anlegen.getItems().remove(0, lv_krankheiten_anlegen.getItems().size());
+        }
+        this.lv_krankheiten_anlegen.setItems(FXCollections.observableArrayList(dao.getAllKrankheiten()));
+        this.lv_krankheiten_anlegen.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        this.lv_krankheiten_anlegen.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
+
+        if(this.lv_krankheiten_bearb.getItems().size() > 0){
+            this.lv_krankheiten_bearb.getItems().remove(0, lv_krankheiten_bearb.getItems().size());
+        }
+        this.lv_krankheiten_bearb.setItems(FXCollections.observableArrayList(dao.getAllKrankheiten()));
+        this.lv_krankheiten_bearb.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        this.lv_krankheiten_bearb.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
     }
 
     private void initializeBeschreibungChoicebox() {
@@ -190,6 +258,45 @@ public class Controller implements Initializable{
         }
     }
 
+    public void savePatient(ActionEvent event) {
+        Patient p = new Patient();
+        p.setAdresse(tf_adresse_anlegen.getText());
+        try {
+            p.setGebDatum(dc_gebdatum_anlegen.getValue());
+        } catch (Exception e){
+            createDialog(Alert.AlertType.ERROR, null, null, "Bitte ein Gültiges Datum auswählen.");
+        }
+        p.setTelNummer(tf_telnr_anlegen.getText());
+        if(tf_tarif_anlegen.getText() != null || tf_vname_anlegen.equals("") || tf_nname_anlegen.equals("")) {
+            p.setVorname(tf_vname_anlegen.getText());
+            p.setNachname(tf_nname_anlegen.getText());
+            try {
+                p.setTarif(Double.valueOf(tf_tarif_anlegen.getText()));
+            } catch (NumberFormatException ex){
+                createDialog(Alert.AlertType.ERROR, null, null, "Vorname/Nachname/Tarif sind Pflichtfelder. Der Tarif muss ein Zahlenwert sein!!");
+            }
+        } else {
+            p.setTarif(0.0);
+        }
+
+        ObservableList<Krankheit> krankList = (ObservableList<Krankheit>)this.lv_krankheiten_anlegen.getSelectionModel().getSelectedItems();
+        ArrayList<Krankheit> krankheitenListe = new ArrayList<>();
+        for(Krankheit k : krankList){
+            krankheitenListe.add(k);
+        }
+
+        p.setKrankheiten(krankheitenListe);
+
+        boolean ret = dao.createPatient(p);
+
+        if(ret){
+            createDialog(Alert.AlertType.INFORMATION, null, null, "Patient wurde erfolgreich gespeichert.");
+        } else {
+            createDialog(Alert.AlertType.ERROR, null, null, "Patient konnte nicht gespeichert werden.");
+        }
+
+    }
+
     public ButtonType createDialog(Alert.AlertType type, String title, String headerText, String contentText){
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -204,5 +311,4 @@ public class Controller implements Initializable{
             return ButtonType.CANCEL;
         }
     }
-
 }
