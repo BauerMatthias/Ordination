@@ -11,7 +11,7 @@ public class DBConnector {
     private static Connection openConnection() throws SQLException{
         try {
             Class.forName("org.h2.Driver");
-            con = DriverManager.getConnection("jdbc:h2:C:\\Users\\Matthias\\Desktop\\Ordination\\Ordination\\NadineOrdination", "admin", "admin");
+            con = DriverManager.getConnection("jdbc:h2:C:\\Users\\Matthias\\Desktop\\Ordination\\Ordination\\NadineOrdination\\db", "admin", "admin");
         } catch (ClassNotFoundException ex) {
             System.err.println("Datenbanktreiber nicht verfuegbar - Fehler: " + ex);
         } catch (SQLException e){

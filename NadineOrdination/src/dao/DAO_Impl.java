@@ -180,7 +180,7 @@ public class DAO_Impl implements DAO {
         try {
             Connection c = DBConnector.getConnection();
             String sql = "SELECT TARIF FROM PATIENT WHERE P_ID = ?";
-            PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+            PreparedStatement pstm = c.prepareStatement(sql);
             System.out.println("Übergebener patient: " + p.getId());
             pstm.setInt(1, p.getId());
             ResultSet rs = pstm.executeQuery();
@@ -233,14 +233,13 @@ public class DAO_Impl implements DAO {
         int i = 0;
         try {
             Connection c = DBConnector.getConnection();
-            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("INSERT INTO BEHANDLUNG (B_ID, P_ID, DATUM, BEH_BESCHREIBUNG, EINNAHME, BEMERKUNG) VALUES(?, ?, ?, ?, ?, ?)");
+            PreparedStatement pstm = c.prepareStatement("INSERT INTO BEHANDLUNG (P_ID, DATUM, BEH_BESCHREIBUNG, EINNAHME, BEMERKUNG) VALUES(?, ?, ?, ?, ?);");
 
-            pstm.setInt(1, b.getId());
-            pstm.setInt(2, b.getPatient().getId());
-            pstm.setDate(3, Date.valueOf(b.getDatum()));
-            pstm.setString(4, b.getBeschreibung().name());
-            pstm.setDouble(5, b.getEinnahme());
-            pstm.setString(6, b.getBemerkung());
+            pstm.setInt(1, b.getPatient().getId());
+            pstm.setDate(2, Date.valueOf(b.getDatum()));
+            pstm.setString(3, b.getBeschreibung());
+            pstm.setDouble(4, b.getEinnahme());
+            pstm.setString(5, b.getBemerkung());
 
             i = pstm.executeUpdate();
         } catch (SQLException e) {
@@ -301,7 +300,7 @@ public class DAO_Impl implements DAO {
 
                 LocalDate convertedDate = datum.toLocalDate();
 
-                ret.add(new Behandlung(b_id, p, convertedDate, Behandlung_Beschreibung.valueOf(beh_beschreibung), einnahme, bemerkung));
+                ret.add(new Behandlung(b_id, p, convertedDate, beh_beschreibung, einnahme, bemerkung));
             }
         } catch (SQLException e) {
             e.printStackTrace();

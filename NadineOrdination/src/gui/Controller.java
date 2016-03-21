@@ -5,13 +5,18 @@ import dao.DAO_Impl;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import model.Behandlung;
 import model.Behandlung_Beschreibung;
 import model.Patient;
 
+import javax.security.auth.callback.ConfirmationCallback;
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -141,4 +146,63 @@ public class Controller implements Initializable{
         this.cb_patient_bearb_loesch.setItems(FXCollections.observableArrayList(dao.getAllPatienten()));
 
     }
+
+    public void saveBehandlung(ActionEvent actionEvent) {
+
+        Behandlung save = new Behandlung();
+
+        save.setPatient((Patient) cb_patient.getValue());
+        save.setDatum(dc_datum.getValue());
+
+        String beschreibung = "";
+
+        if(cb_beschreibung.getValue().equals(Behandlung_Beschreibung.sonstiges)){
+            save.setBeschreibung(tf_beschreibung_sonstiges.getText());
+        } else {
+            Behandlung_Beschreibung b = (Behandlung_Beschreibung) cb_beschreibung.getValue();
+            save.setBeschreibung(b.name());
+        }
+
+        Double chosenEinnahme = 0.0;
+
+        try {
+            save.setEinnahme(Double.valueOf(tf_einnahme.getText()));
+        } catch (NumberFormatException ex){
+            System.err.println("keine Double eingabe in Einnahme.");
+        }
+
+        save.setBemerkung(ta_bemerkung.getText());
+
+        ButtonType type = createDialog(Alert.AlertType.CONFIRMATION, "Speichern der Behandlung", null, "Willst du diese Behandlung speichern?");
+
+        boolean ret = false;
+
+        if(type == ButtonType.OK){
+           ret = dao.createBehandlung(save);
+        } else if(type == ButtonType.CANCEL){
+            ret = dao.createBehandlung(save);
+        }
+
+        if(ret){
+            createDialog(Alert.AlertType.INFORMATION, null, null, "Behandlung wurde erfolgreich gespeichert.");
+        } else {
+            createDialog(Alert.AlertType.INFORMATION, null, null, "Behandlung konnte nicht gespeichert werden.");
+        }
+    }
+
+    public ButtonType createDialog(Alert.AlertType type, String title, String headerText, String contentText){
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if(result.get() == ButtonType.OK){
+            return ButtonType.OK;
+        } else {
+            return ButtonType.CANCEL;
+        }
+    }
+
 }

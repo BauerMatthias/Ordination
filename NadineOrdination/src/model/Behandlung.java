@@ -12,14 +12,14 @@ public class Behandlung {
     private Patient patient;
     private LocalDate datum;
     private ArrayList<Krankheit> krankheiten;
-    private Behandlung_Beschreibung beschreibung;
+    private String beschreibung;
     private double einnahme;
     private String bemerkung;
 
     public Behandlung() {
     }
 
-    public Behandlung(int id, Patient patient, LocalDate datum, Behandlung_Beschreibung beschreibung, double einnahme, String bemerkung) {
+    public Behandlung(int id, Patient patient, LocalDate datum, String beschreibung, double einnahme, String bemerkung) {
         this.id = id;
         this.patient = patient;
         this.datum = datum;
@@ -28,7 +28,7 @@ public class Behandlung {
         this.bemerkung = bemerkung;
     }
 
-    public Behandlung(int id, Patient patient, LocalDate datum, ArrayList<Krankheit> krankheiten, Behandlung_Beschreibung beschreibung, double einnahme, String bemerkung) {
+    public Behandlung(int id, Patient patient, LocalDate datum, ArrayList<Krankheit> krankheiten, String beschreibung, double einnahme, String bemerkung) {
         this.id = id;
         this.patient = patient;
         this.datum = datum;
@@ -70,11 +70,11 @@ public class Behandlung {
         this.krankheiten = krankheiten;
     }
 
-    public Behandlung_Beschreibung getBeschreibung() {
+    public String getBeschreibung() {
         return beschreibung;
     }
 
-    public void setBeschreibung(Behandlung_Beschreibung beschreibung) {
+    public void setBeschreibung(String beschreibung) {
         this.beschreibung = beschreibung;
     }
 

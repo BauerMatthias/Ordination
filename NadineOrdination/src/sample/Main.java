@@ -2,6 +2,7 @@ package sample;
 
 import dao.DAO;
 import dao.DAO_Impl;
+import dao.DBConnector;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +21,8 @@ public class Main extends Application {
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 700, 500));
         primaryStage.show();
+
+        DBConnector.closeConnection();
     }
 
 
