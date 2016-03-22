@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Behandlung_Beschreibung;
+import model.Krankheit;
 import model.Patient;
 
 import java.util.ArrayList;
@@ -27,6 +28,18 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
+//        System.out.println("size: ");
+//        DAO_Impl d = new DAO_Impl();
+//        Patient p = new Patient();
+//        p.setVorname("Bettina");
+//        p.setNachname("Bauer");
+//        p.setId(d.getIdFromPatient(p));
+//        ArrayList<Krankheit> k = d.getAllKrankheitenByPatient(p);
+//
+//        for(Krankheit kr : k){
+//            System.out.println(kr);
+//        }
+
         launch(args);
     }
 }

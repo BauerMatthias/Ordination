@@ -309,4 +309,123 @@ public class DAO_Impl implements DAO {
 
         return ret;
     }
+
+    @Override
+    public boolean saveAllKrankheitenByPatient(Patient p, ArrayList<Krankheit> k) {
+        boolean ret = false;
+        if(p == null){
+            throw new IllegalArgumentException();
+        }
+
+        int i = 0;
+        int h = 0;
+        try {
+            Connection c = DBConnector.getConnection();
+            PreparedStatement pstm = c.prepareStatement("INSERT INTO PAT_KRANK (P_ID, K_ID) VALUES(?, ?);");
+            p.setId(getIdFromPatient(p));
+
+            for(Krankheit krank : k){
+                pstm.setInt(1, p.getId());
+                pstm.setInt(2, krank.getNummer());
+
+                h = pstm.executeUpdate();
+
+                if(h != 0){
+                    ret = true;
+                } else {
+                    ret = false;
+                }
+
+                h = 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int getIdFromPatient(Patient p) {
+        Patient ret = new Patient();
+        try {
+            Connection c = DBConnector.getConnection();
+            String sql = "SELECT * FROM PATIENT WHERE vname=? AND nname=?;";
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+
+            pstm.setString(1, p.getVorname());
+            pstm.setString(2, p.getNachname());
+
+            ResultSet rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                ret.setId(rs.getInt("P_ID"));
+                ret.setVorname(rs.getString("VNAME"));
+                ret.setNachname(rs.getString("NNAME"));
+                ret.setAdresse(rs.getString("ADRESSE"));
+                ret.setGebDatum(rs.getDate("GEBDATUM").toLocalDate());
+                ret.setTelNummer(rs.getString("TELNR"));
+                ret.setTarif(rs.getDouble("TARIF"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        return ret.getId();
+    }
+
+    @Override
+    public ArrayList<Krankheit> getAllKrankheitenByPatient(Patient p) {
+        ArrayList<Krankheit> ret = new ArrayList<Krankheit>();
+        try {
+            Connection c = DBConnector.getConnection();
+            String sql = "SELECT * FROM PAT_Krank WHERE P_ID=?";
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+            pstm.setInt(1, p.getId());
+            ResultSet rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                ret.add(getKrankheitbyID(rs.getInt("K_ID")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        return ret;
+    }
+
+    @Override
+    public Krankheit getKrankheitbyID(int id) {
+        Krankheit ret = new Krankheit();
+        try {
+            Connection c = DBConnector.getConnection();
+            String sql = "SELECT * FROM KRANKHEIT WHERE K_ID=?";
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+            pstm.setInt(1, id);
+            ResultSet rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                int k_id = rs.getInt("K_ID");
+                String beschreibung = rs.getString("BESCHREIBUNG");
+
+                ret.setNummer(k_id);
+                ret.setBeschreibung(beschreibung);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        return ret;
+    }
+
+
 }

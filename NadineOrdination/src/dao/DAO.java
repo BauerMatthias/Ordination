@@ -40,4 +40,16 @@ public interface DAO {
 
     // Gibt alle Behandlungen aus der DB zurück
     public ArrayList<Behandlung> getAllBehandlungen();
+
+    // Speichert alle Krankheiten für einen Patienten ab
+    public boolean saveAllKrankheitenByPatient(Patient p, ArrayList<Krankheit> k);
+
+    // Gibt die ID eines Patienten zurück
+    public int getIdFromPatient(Patient p);
+
+    // Gibt alle Krankheiten eines Patienten zurück
+    public ArrayList<Krankheit> getAllKrankheitenByPatient(Patient p);
+
+    // Gibt die Krankheit mit der ID zurück
+    public Krankheit getKrankheitbyID(int id);
 }

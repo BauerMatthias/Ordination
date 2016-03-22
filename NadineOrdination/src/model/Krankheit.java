@@ -38,4 +38,21 @@ public class Krankheit {
     public String toString() {
         return beschreibung;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Krankheit)) return false;
+
+        Krankheit krankheit = (Krankheit) o;
+
+        if (!beschreibung.equals(krankheit.beschreibung)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return beschreibung.hashCode();
+    }
 }

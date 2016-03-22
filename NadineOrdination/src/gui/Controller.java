@@ -81,11 +81,19 @@ public class Controller implements Initializable{
     public Button btn_pat_anlegen_speichern;
     @FXML
     public Button btn_pat_bearb_speichern;
+    @FXML
+    public Button btn_pfeilRechts;
+    @FXML
+    public Button btn_pfeilLinks;
+    @FXML
+    public Button btn_delete_patient;
 
     @FXML
     public ListView lv_krankheiten_anlegen;
     @FXML
     public ListView lv_krankheiten_bearb;
+    @FXML
+    public ListView lv_krankheiten_bearb_right;
 
     @FXML
     public TableColumn tv_anzeigeAllePatienten;
@@ -129,6 +137,7 @@ public class Controller implements Initializable{
                 Patient chosen = (Patient) cb_patient_bearb_loesch.getItems().get(newValue.intValue());
 
                 if(chosen != null) {
+                    initializePatientBearbeitenKrankheitenListView(chosen);
                     fillBearbeitenPatient(chosen);
 
                 }
@@ -140,6 +149,42 @@ public class Controller implements Initializable{
         initializeBeschreibungChoicebox();
         initializeKrankheitenListView();
         initializePatientBearbeitenChoicebox();
+        initializePatientBearbeitenKrankheitenListView(null);
+    }
+
+    private void initializePatientBearbeitenKrankheitenListView(Patient p) {
+        if(this.lv_krankheiten_bearb.getItems().size() > 0){
+            this.lv_krankheiten_bearb.getItems().remove(0, lv_krankheiten_bearb.getItems().size());
+        }
+        if(this.lv_krankheiten_bearb_right.getItems().size() > 0){
+            this.lv_krankheiten_bearb_right.getItems().remove(0, lv_krankheiten_bearb_right.getItems().size());
+        }
+
+        if(p != null) {
+            ArrayList<Krankheit> kAllList = dao.getAllKrankheiten();
+            ArrayList<Krankheit> kPatList = dao.getAllKrankheitenByPatient(p);
+            this.lv_krankheiten_bearb.setItems(FXCollections.observableArrayList(kPatList));
+            this.lv_krankheiten_bearb.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            this.lv_krankheiten_bearb.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
+
+            ArrayList<Krankheit> list = new ArrayList<>();
+            for(Krankheit k : kAllList){
+                if(!kPatList.contains(k)){
+                    list.add(k);
+                }
+            }
+
+            this.lv_krankheiten_bearb_right.setItems(FXCollections.observableArrayList(list));
+            this.lv_krankheiten_bearb_right.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            this.lv_krankheiten_bearb_right.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
+
+        } else if(p == null){
+            this.lv_krankheiten_bearb.setItems(FXCollections.observableArrayList(dao.getAllKrankheiten()));
+            this.lv_krankheiten_bearb.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            this.lv_krankheiten_bearb.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
+
+            this.lv_krankheiten_bearb_right.getItems().remove(0, lv_krankheiten_bearb_right.getItems().size());
+        }
     }
 
     private void fillBearbeitenPatient(Patient p){
@@ -149,21 +194,6 @@ public class Controller implements Initializable{
         dc_gebdatum_bearb.setValue(p.getGebDatum());
         tf_telnr_bearb.setText(p.getTelNummer());
         tf_tarif_bearb.setText(Double.toString(p.getTarif()));
-        selectKrankheitenbyPatient(p);
-    }
-
-    private void selectKrankheitenbyPatient(Patient p) {
-        System.out.println("p: " + p);
-        for(Krankheit k : p.getKrankheiten()){
-            System.out.println(k);
-        }
-
-        for(Krankheit k : p.getKrankheiten()) {
-            System.out.println("index: " + lv_krankheiten_bearb.getItems().indexOf(k));
-        }
-//        for(Krankheit k : p.getKrankheiten()){
-//            lv_krankheiten_bearb.getSelectionModel().select(lv_krankheiten_bearb.getItems().indexOf(k));
-//        }
     }
 
     private void initializePatientBearbeitenChoicebox() {
@@ -186,13 +216,6 @@ public class Controller implements Initializable{
         this.lv_krankheiten_anlegen.setItems(FXCollections.observableArrayList(dao.getAllKrankheiten()));
         this.lv_krankheiten_anlegen.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.lv_krankheiten_anlegen.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
-
-        if(this.lv_krankheiten_bearb.getItems().size() > 0){
-            this.lv_krankheiten_bearb.getItems().remove(0, lv_krankheiten_bearb.getItems().size());
-        }
-        this.lv_krankheiten_bearb.setItems(FXCollections.observableArrayList(dao.getAllKrankheiten()));
-        this.lv_krankheiten_bearb.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.lv_krankheiten_bearb.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
     }
 
     private void initializeBeschreibungChoicebox() {
@@ -288,9 +311,11 @@ public class Controller implements Initializable{
         p.setKrankheiten(krankheitenListe);
 
         boolean ret = dao.createPatient(p);
+        boolean saveKrankheiten = dao.saveAllKrankheitenByPatient(p, p.getKrankheiten());
 
-        if(ret){
+        if(ret && saveKrankheiten){
             createDialog(Alert.AlertType.INFORMATION, null, null, "Patient wurde erfolgreich gespeichert.");
+            initializePatientBearbeitenChoicebox();
         } else {
             createDialog(Alert.AlertType.ERROR, null, null, "Patient konnte nicht gespeichert werden.");
         }
