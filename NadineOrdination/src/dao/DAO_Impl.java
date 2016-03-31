@@ -152,7 +152,7 @@ public class DAO_Impl implements DAO {
         int i = 0;
         try {
             Connection c = DBConnector.getConnection();
-            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("DELETE FROM PATIENT WHERE P_ID = ?");
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("DELETE FROM PATIENT WHERE P_ID = ? CASCADE");
             pstm.setInt(1, p.getId());
             i = pstm.executeUpdate();
         } catch (SQLException e) {
@@ -427,5 +427,84 @@ public class DAO_Impl implements DAO {
         return ret;
     }
 
+    @Override
+    public boolean updateKrankheit(Krankheit k) {
+        if(k == null){
+            throw new IllegalArgumentException("Übergebene Krankheit gleich NULL");
+        }
+
+        int i = 0;
+        try {
+            Connection c = DBConnector.getConnection();
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("UPDATE Krankheit SET BESCHREIBUNG = ? WHERE K_ID = ?");
+            pstm.setString(1, k.getBeschreibung());
+            pstm.setInt(2, k.getNummer());
+
+            i = pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        if(i >= 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean saveKrankheit(Krankheit k) {
+        if(k == null){
+            throw new IllegalArgumentException("Übergebene Krankheit ist NULL.");
+        }
+
+        int i = 0;
+        try {
+            Connection c = DBConnector.getConnection();
+            PreparedStatement pstm = c.prepareStatement("INSERT INTO KRANKHEIT (BESCHREIBUNG) VALUES(?);");
+
+            pstm.setString(1, k.getBeschreibung());
+
+            i = pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        if(i >= 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Krankheit getKrankheitbyBeschreibung(String beschreibung) {
+        Krankheit ret = new Krankheit();
+        try {
+            Connection c = DBConnector.getConnection();
+            String sql = "SELECT * FROM KRANKHEIT WHERE BESCHREIBUNG=?";
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+            pstm.setString(1, beschreibung);
+            ResultSet rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                int k_id = rs.getInt("K_ID");
+                String beschr = rs.getString("BESCHREIBUNG");
+
+                ret.setNummer(k_id);
+                ret.setBeschreibung(beschr);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        return ret;
+    }
 
 }

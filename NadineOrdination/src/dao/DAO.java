@@ -52,4 +52,13 @@ public interface DAO {
 
     // Gibt die Krankheit mit der ID zurück
     public Krankheit getKrankheitbyID(int id);
+
+    // Verändert die übergebene Krankheit
+    public boolean updateKrankheit(Krankheit k);
+
+    // Speichert die neue Krankheit ab
+    public boolean saveKrankheit(Krankheit k);
+
+    // Gibt die Krankheit mit der Beschreibung zurück
+    public Krankheit getKrankheitbyBeschreibung(String beschreibung);
 }

@@ -20,7 +20,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("../gui/sample.fxml"));
         primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 700, 500));
+        primaryStage.setScene(new Scene(root, 800, 800));
         primaryStage.show();
 
         DBConnector.closeConnection();
