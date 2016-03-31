@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import model.Behandlung;
 import model.Behandlung_Beschreibung;
@@ -38,6 +39,19 @@ public class Controller implements Initializable{
     DAO dao = new DAO_Impl();
 
     @FXML
+    public ToggleGroup group1;
+
+    @FXML
+    public RadioButton rbtn_stat_Pat;
+    @FXML
+    public RadioButton rbtn_stat_date;
+
+    @FXML
+    public Pane pane_statistikbyPatient;
+    @FXML
+    public Pane pane_statistikbyDate;
+
+    @FXML
     public ChoiceBox cb_patient;
     @FXML
     public ChoiceBox cb_beschreibung;
@@ -51,6 +65,10 @@ public class Controller implements Initializable{
     public DatePicker dc_gebdatum_anlegen;
     @FXML
     public DatePicker dc_gebdatum_bearb;
+    @FXML
+    public DatePicker dp_fromDate;
+    @FXML
+    public DatePicker dp_toDate;
 
     @FXML
     public TextField tf_dauer;
@@ -102,6 +120,10 @@ public class Controller implements Initializable{
     public Button btn_addKrankheit;
     @FXML
     public Button btn_changeKrankheit;
+    @FXML
+    public Button btn_deleteKrankheit;
+    @FXML
+    public Button btn_showStatistik;
 
     @FXML
     public ListView lv_krankheiten_anlegen;
@@ -109,6 +131,8 @@ public class Controller implements Initializable{
     public ListView lv_krankheiten_bearb;
     @FXML
     public ListView lv_krankheiten_bearb_right;
+    @FXML
+    public ListView lv_statistikPatienten;
 
     @FXML
     public TableView<Patient> tv_anzeigeAllePatienten = new TableView<Patient>();
@@ -180,6 +204,16 @@ public class Controller implements Initializable{
         initializePatientBearbeitenKrankheitenListView(null);
         initializeTableviewPatient();
         initializeTableviewKrankheiten();
+        initializePatientenListView();
+    }
+
+    private void initializePatientenListView() {
+        if(this.lv_statistikPatienten.getItems().size() > 0){
+            this.lv_statistikPatienten.getItems().remove(0, lv_statistikPatienten.getItems().size());
+        }
+        this.lv_statistikPatienten.setItems(FXCollections.observableArrayList(dao.getAllPatienten()));
+        this.lv_statistikPatienten.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        this.lv_statistikPatienten.setTooltip(new Tooltip("Multiauswahl: STRG (halten) und mit Maus auswählen."));
     }
 
     private void initializeTableviewKrankheiten() {
@@ -537,6 +571,7 @@ public class Controller implements Initializable{
             createDialog(Alert.AlertType.INFORMATION, null, null, "Krankheit erfolgreich gespeichert.");
             initializeTableviewKrankheiten();
             initializeKrankheitenListView();
+            tf_addKrankheit.setText("");
         } else {
             createDialog(Alert.AlertType.ERROR, null, null, "Krankheit konnte nicht gespeichert werden.");
         }
@@ -555,9 +590,52 @@ public class Controller implements Initializable{
                 createDialog(Alert.AlertType.INFORMATION, null, null, "Krankheit wurde bearbeitet");
                 initializeKrankheitenListView();
                 initializeTableviewKrankheiten();
+                tf_changeKrankheit.setText("");
             } else {
                 createDialog(Alert.AlertType.ERROR, null, null, "Krankheit konnte nicht bearbeitet werden.");
             }
+        }
+    }
+
+    public void deleteKrankheit(ActionEvent actionEvent) {
+        if(tv_alleKrankheiten.getSelectionModel().getSelectedItem().equals(null)){
+            createDialog(Alert.AlertType.INFORMATION, null, null, "Bitte wähle eine Krankheit aus der Liste aus!");
+        } else {
+            Krankheit k = dao.getKrankheitbyBeschreibung(tv_alleKrankheiten.getSelectionModel().getSelectedItem().getBeschreibung());
+
+            boolean delete = dao.deleteKrankheit(k);
+
+            if(delete){
+                createDialog(Alert.AlertType.INFORMATION, null, null, "Krankheit wurde gelöscht.");
+                initializeKrankheitenListView();
+                initializeTableviewKrankheiten();
+                tf_changeKrankheit.setText("");
+            } else {
+                createDialog(Alert.AlertType.ERROR, null, null, "Krankheit konnte nicht gelöscht werden.");
+            }
+        }
+    }
+
+    public void viewPanePatient(ActionEvent actionEvent) {
+        System.out.println("view patienten pane");
+    }
+
+    public void viewPaneDate(ActionEvent actionEvent) {
+        System.out.println("view date pane");
+    }
+
+    public void showStatistik(ActionEvent actionEvent) {
+        if(this.lv_statistikPatienten.getSelectionModel().getSelectedItems().size() == 0){
+            createDialog(Alert.AlertType.ERROR, null, null, "Bitte mindestens einen Patienten auswählen.");
+//        } else if(this.dp_fromDate.getValue().getMonth().equals(null) || this.dp_toDate.getValue().getMonth().equals(null)){
+//            createDialog(Alert.AlertType.ERROR, null, null, "Bitte ein VON- und BIS-Datum eingeben.");
+        } else if(!this.dp_fromDate.getValue().isBefore(this.dp_toDate.getValue())){
+            createDialog(Alert.AlertType.ERROR, null, null, "Von-Datum muss vor dem Bis-Datum liegen.");
+        } else {
+            ObservableList<Patient> patList = (ObservableList<Patient>)this.lv_statistikPatienten.getSelectionModel().getSelectedItems();
+            ArrayList<Patient> patientenListe = new ArrayList<>();
+
+            // TODO
         }
     }
 }

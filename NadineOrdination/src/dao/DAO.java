@@ -4,7 +4,9 @@ import model.Behandlung;
 import model.Krankheit;
 import model.Patient;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Matthias on 10.03.2016.
@@ -61,4 +63,10 @@ public interface DAO {
 
     // Gibt die Krankheit mit der Beschreibung zurück
     public Krankheit getKrankheitbyBeschreibung(String beschreibung);
+
+    // Löscht eine Krankheit aus der Datenbank
+    public boolean deleteKrankheit(Krankheit k);
+
+    // Holt die Statistik eines Patienten in einem Zeitraum
+    public Map<LocalDate, Double> getStatistikByPatient(Patient p, LocalDate fromDate, LocalDate toDate);
 }

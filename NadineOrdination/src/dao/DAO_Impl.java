@@ -8,6 +8,7 @@ import model.Patient;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Matthias on 10.03.2016.
@@ -505,6 +506,37 @@ public class DAO_Impl implements DAO {
         }
 
         return ret;
+    }
+
+    @Override
+    public boolean deleteKrankheit(Krankheit k) {
+        if(k == null){
+            throw new IllegalArgumentException("Übergebene Krankheit gleich NULL");
+        }
+
+        int i = 0;
+        try {
+            Connection c = DBConnector.getConnection();
+            PreparedStatement pstm = DBConnector.getConnection().prepareStatement("DELETE FROM KRANKHEIT WHERE K_ID = ?");
+            pstm.setInt(1, k.getNummer());
+            i = pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnector.closeConnection();
+        }
+
+        if(i >= 1){
+            return true;
+        } else {
+            System.out.println("Es wurde kein Datensatz gelöscht.");
+            return false;
+        }
+    }
+
+    @Override
+    public Map<LocalDate, Double> getStatistikByPatient(Patient p, LocalDate fromDate, LocalDate toDate) {
+        return null;
     }
 
 }
