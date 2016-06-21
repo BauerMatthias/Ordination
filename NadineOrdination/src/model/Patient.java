@@ -20,6 +20,11 @@ public class Patient {
     public Patient() {
     }
 
+    public Patient(String vorname, String nachname) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+    }
+
     public Patient(int id, String vorname, String nachname, String adresse, LocalDate gebDatum, String telNummer, double tarif) {
         this.id = id;
         this.vorname = vorname;
@@ -108,5 +113,26 @@ public class Patient {
     @Override
     public String toString() {
         return vorname + " " + nachname;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Patient patient = (Patient) o;
+
+        if (id != patient.id) return false;
+        if (vorname != null ? !vorname.equals(patient.vorname) : patient.vorname != null) return false;
+        return !(nachname != null ? !nachname.equals(patient.nachname) : patient.nachname != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
+        result = 31 * result + (nachname != null ? nachname.hashCode() : 0);
+        return result;
     }
 }

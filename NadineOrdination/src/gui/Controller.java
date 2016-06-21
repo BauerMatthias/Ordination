@@ -1,9 +1,9 @@
 package gui;
 
-import com.sun.prism.impl.Disposer;
 import dao.DAO;
 import dao.DAO_Impl;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -12,29 +12,35 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.util.Callback;
-import model.Behandlung;
-import model.Behandlung_Beschreibung;
-import model.Krankheit;
-import model.Patient;
+import javafx.scene.shape.Rectangle;
+import javafx.util.StringConverter;
+import model.*;
+import gui.DateAxis;
+import javafx.scene.chart.NumberAxis;
 
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.swing.table.*;
 import java.net.URL;
+import java.security.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * Erstellt von Matthias Bauer am 03.03.2016.
  */
 
 public class Controller implements Initializable{
+
 
     DAO dao = new DAO_Impl();
 
@@ -69,6 +75,10 @@ public class Controller implements Initializable{
     public DatePicker dp_fromDate;
     @FXML
     public DatePicker dp_toDate;
+    @FXML
+    public DatePicker dp_toDate_datumsstatistik;
+    @FXML
+    public DatePicker dp_fromDate_datumsstatistik;
 
     @FXML
     public TextField tf_dauer;
@@ -124,6 +134,8 @@ public class Controller implements Initializable{
     public Button btn_deleteKrankheit;
     @FXML
     public Button btn_showStatistik;
+    @FXML
+    public Button btn_datumsstatistik;
 
     @FXML
     public ListView lv_krankheiten_anlegen;
@@ -140,6 +152,20 @@ public class Controller implements Initializable{
     @FXML
     public TableView<Krankheit> tv_alleKrankheiten = new TableView<Krankheit>();
 
+    @FXML
+    public LineChart lc_statistik;
+
+    @FXML
+    private DateAxis xAxis = new DateAxis();
+
+    @FXML
+    private Rectangle rect;
+
+    @FXML
+    public Pane p_statistic;
+
+    @FXML
+    public Label lbl_gesamtWert;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -427,7 +453,7 @@ public class Controller implements Initializable{
         boolean ret = false;
 
         if(type == ButtonType.OK){
-           ret = dao.createBehandlung(save);
+            ret = dao.createBehandlung(save);
         } else if(type == ButtonType.CANCEL){
             ret = dao.createBehandlung(save);
         }
@@ -625,17 +651,131 @@ public class Controller implements Initializable{
     }
 
     public void showStatistik(ActionEvent actionEvent) {
+
         if(this.lv_statistikPatienten.getSelectionModel().getSelectedItems().size() == 0){
             createDialog(Alert.AlertType.ERROR, null, null, "Bitte mindestens einen Patienten auswählen.");
-//        } else if(this.dp_fromDate.getValue().getMonth().equals(null) || this.dp_toDate.getValue().getMonth().equals(null)){
-//            createDialog(Alert.AlertType.ERROR, null, null, "Bitte ein VON- und BIS-Datum eingeben.");
-        } else if(!this.dp_fromDate.getValue().isBefore(this.dp_toDate.getValue())){
-            createDialog(Alert.AlertType.ERROR, null, null, "Von-Datum muss vor dem Bis-Datum liegen.");
-        } else {
+        }else if(this.dp_fromDate.getValue() == null || this.dp_toDate.getValue() == null){
+            ObservableList<Patient> patList = (ObservableList<Patient>)this.lv_statistikPatienten.getSelectionModel().getSelectedItems();
+            ArrayList<Patient> patientenListe = new ArrayList<>();
+
+            LocalTime lt = LocalTime.of(0, 0);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy");
+
+            for(Patient p : patList) {
+                DateAxis xAxisDate = getDateAxis(dtf);
+                NumberAxis yAxisMoney = new NumberAxis();
+                yAxisMoney.setLowerBound(0.0);
+                yAxisMoney.setUpperBound(100.0);
+
+                LineChart<LocalDateTime, Number> lc_statistic = new LineChart<LocalDateTime, Number>(xAxisDate, yAxisMoney);
+
+                XYChart.Series<LocalDateTime, Number> seriePerson = new XYChart.Series<>();
+                lc_statistik = new LineChart<LocalDateTime, Number>(xAxisDate, yAxisMoney);
+
+                lc_statistik.setTitle("Statistik der ausgewählten Personen");
+
+                lc_statistik.setMinHeight(500);
+                lc_statistik.setCreateSymbols(false);
+
+                ArrayList<Statistik_Daten> patientenDaten = dao.getStatistikByPatient(p, null, null);
+
+                for(int i = 0; i < patientenDaten.size(); i++){
+                    if(patientenDaten.get(i) != null){
+                        seriePerson.getData().add(new XYChart.Data<>(patientenDaten.get(i).getDate(), patientenDaten.get(i).getWert()));
+                    }
+                    if(i == 0){
+                        xAxisDate.setLowerBound(patientenDaten.get(i).getDate().minusDays(1));
+                    }
+                    if(i == patientenDaten.size()){
+                        xAxisDate.setUpperBound(patientenDaten.get(i).getDate().plusDays(1));
+                    }
+                }
+
+                seriePerson.setName(p.getVorname() + " " + p.getNachname());
+                lc_statistik.getData().add(seriePerson);
+                lc_statistic.setCreateSymbols(false);
+                p_statistic.getChildren().add(lc_statistik);
+                lc_statistik.setVisible(true);
+            }
+        } else if(this.dp_fromDate.getValue() != null || this.dp_toDate.getValue() != null){
             ObservableList<Patient> patList = (ObservableList<Patient>)this.lv_statistikPatienten.getSelectionModel().getSelectedItems();
             ArrayList<Patient> patientenListe = new ArrayList<>();
 
             // TODO
+        } else if(!this.dp_fromDate.getValue().isBefore(this.dp_toDate.getValue())) {
+            createDialog(Alert.AlertType.ERROR, null, null, "Von-Datum muss vor dem Bis-Datum liegen.");
+        } else {
+            createDialog(Alert.AlertType.ERROR, null, null, "Ein unbekannter Fehler bei der Erstellung der Statistik ist aufgetreten.");
+        }
+    }
+
+    private DateAxis getDateAxis(final DateTimeFormatter dtf) {
+        DateAxis xAxisTemporary = new DateAxis();
+        xAxisTemporary.setAutoRanging(false);
+        xAxisTemporary.setTickLabelFormatter(new StringConverter<LocalDateTime>() {
+            @Override
+            public String toString(LocalDateTime object) {
+                return object.format(dtf);
+            }
+
+            @Override
+            public LocalDateTime fromString(String string) {
+                return null;
+            }
+        });
+        xAxisTemporary.lowerBoundProperty().bindBidirectional(xAxis.lowerBoundProperty());
+        xAxisTemporary.upperBoundProperty().bindBidirectional(xAxis.upperBoundProperty());
+        return xAxisTemporary;
+    }
+
+    public void showDatumsstatistik(ActionEvent actionEvent) {
+        if (this.dp_fromDate_datumsstatistik.getValue() != null && this.dp_toDate_datumsstatistik.getValue() != null) {
+            if (this.dp_fromDate_datumsstatistik.getValue().isBefore(this.dp_toDate_datumsstatistik.getValue())) {
+
+                p_statistic.getChildren().remove(0, p_statistic.getChildren().size());
+
+                ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+                Map<Patient, Double> patListEinnahmen = new HashMap<>();
+                double gesamtWert = 0.0;
+
+                ArrayList<Statistik_Daten> daten = dao.getStatistikByPatient(null, dp_fromDate_datumsstatistik.getValue(), dp_toDate_datumsstatistik.getValue());
+
+                if (daten.size() != 0) {
+                    for (Statistik_Daten d : daten) {
+                        if (patListEinnahmen.containsKey(d.getP())) {
+                            double wert = patListEinnahmen.get(d.getP());
+                            patListEinnahmen.remove(d.getP());
+                            patListEinnahmen.put(d.getP(), wert + d.getWert());
+                        } else if (!patListEinnahmen.containsKey(d.getP())) {
+                            patListEinnahmen.put(d.getP(), d.getWert());
+                        }
+                        gesamtWert += d.getWert();
+                    }
+
+                    Set<Patient> keySet = patListEinnahmen.keySet();
+
+                    for (Patient p : keySet) {
+                        pieChartData.add(new PieChart.Data(p.toString() + ": " + patListEinnahmen.get(p) + "€", patListEinnahmen.get(p)));
+                    }
+
+                    final PieChart piechart = new PieChart(pieChartData);
+                    piechart.setTitle("Einnahmen im Zeitraum: " + dp_fromDate_datumsstatistik.getValue() + " bis " + dp_toDate_datumsstatistik.getValue());
+
+                    p_statistic.getChildren().add(piechart);
+                    lbl_gesamtWert.setText("Du hast in diesem Zeitraum " + gesamtWert + "€ eingenommen.");
+                } else if (daten.size() == 0) {
+                    final PieChart piechart = new PieChart(pieChartData);
+                    piechart.setTitle("Keine Daten für diesen Zeitraum gefunden.");
+
+                    p_statistic.getChildren().add(piechart);
+                }
+
+
+            } else {
+                createDialog(Alert.AlertType.ERROR, null, null, "Von-Datum muss vor dem Bis-Datum liegen.");
+            }
+        } else {
+            createDialog(Alert.AlertType.ERROR, null, null, "Ein unbekannter Fehler bei der Erstellung der Statistik ist aufgetreten.");
         }
     }
 }

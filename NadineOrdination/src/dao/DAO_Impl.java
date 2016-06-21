@@ -1,12 +1,11 @@
 package dao;
 
-import model.Behandlung;
-import model.Behandlung_Beschreibung;
-import model.Krankheit;
-import model.Patient;
+import model.*;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -535,8 +534,57 @@ public class DAO_Impl implements DAO {
     }
 
     @Override
-    public Map<LocalDate, Double> getStatistikByPatient(Patient p, LocalDate fromDate, LocalDate toDate) {
-        return null;
+    public ArrayList<Statistik_Daten> getStatistikByPatient(Patient p, LocalDate fromDate, LocalDate toDate) {
+        ArrayList<Statistik_Daten> retValue = new ArrayList<>();
+
+        // Datumsstatistik
+        if(p == null && fromDate != null && toDate != null){
+            try {
+                Connection c = DBConnector.getConnection();
+                String sql = "SELECT * FROM BEHANDLUNG WHERE DATUM BETWEEN ? AND ?";
+                PreparedStatement pstm = DBConnector.getConnection().prepareStatement(sql);
+                pstm.setDate(1, Date.valueOf(fromDate));
+                pstm.setDate(2, Date.valueOf(toDate));
+                ResultSet rs = pstm.executeQuery();
+
+                while (rs.next()) {
+                    int p_id = rs.getInt("P_ID");
+                    Patient currPat = getPatientbyID(p_id);
+                    Date currDate = rs.getDate("DATUM");
+                    double einnahme = rs.getDouble("EINNAHME");
+
+                    LocalTime lt = LocalTime.of(0, 0);
+                    LocalDate ld = currDate.toLocalDate();
+                    LocalDateTime convertedDate = LocalDateTime.of(ld, lt);
+
+                    if(retValue.size() > 0) {
+                        for (int i = 0; i < retValue.size(); i++) {
+                            if(retValue.get(i).getP().getId() == currPat.getId()){
+                                retValue.get(i).setWert(retValue.get(i).getWert() + einnahme);
+                            }
+                        }
+                    }
+
+                    retValue.add(new Statistik_Daten(convertedDate, einnahme, currPat));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                DBConnector.closeConnection();
+            }
+
+            return retValue;
+        } else if(p != null && fromDate == null && toDate == null){     // Patientenstatistik ohne Datumangaben
+            retValue.add(new Statistik_Daten(LocalDateTime.of(2016, 6, 4, 0, 0), 63.0, new Patient("Matthias", "Bauer")));
+            retValue.add(new Statistik_Daten(LocalDateTime.of(2016, 6, 5, 0, 0), 17.0, new Patient("Matthias", "Bauer")));
+            retValue.add(new Statistik_Daten(LocalDateTime.of(2016, 6, 6, 0, 0), 85.0, new Patient("Matthias", "Bauer")));
+        } else if(p != null && fromDate != null && toDate != null) {     // Patientenstatistik mit Datumsangaben
+            retValue.add(new Statistik_Daten(LocalDateTime.of(2016, 6, 7, 0, 0), 38.0, new Patient("Thomas", "Prager")));
+            retValue.add(new Statistik_Daten(LocalDateTime.of(2016, 6, 8, 0, 0), 7.0, new Patient("Thomas", "Prager")));
+            retValue.add(new Statistik_Daten(LocalDateTime.of(2016, 6, 9, 0, 0), 150.0, new Patient("Thomas", "Prager")));
+        }
+
+        return retValue;
     }
 
 }

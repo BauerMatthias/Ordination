@@ -3,6 +3,7 @@ package dao;
 import model.Behandlung;
 import model.Krankheit;
 import model.Patient;
+import model.Statistik_Daten;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -68,5 +69,5 @@ public interface DAO {
     public boolean deleteKrankheit(Krankheit k);
 
     // Holt die Statistik eines Patienten in einem Zeitraum
-    public Map<LocalDate, Double> getStatistikByPatient(Patient p, LocalDate fromDate, LocalDate toDate);
+    public ArrayList<Statistik_Daten> getStatistikByPatient(Patient p, LocalDate fromDate, LocalDate toDate);
 }
